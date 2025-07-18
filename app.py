@@ -2,9 +2,11 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# Load the trained model
+# Load model and scaler
 model = pickle.load(open('model.pkl', 'rb'))
+scaler = pickle.load(open('scaler.pkl', 'rb'))
 
+# Streamlit app settings
 st.set_page_config(page_title="Heart Disease Prediction", page_icon="💓")
 st.title("💓 Heart Disease Prediction App")
 st.markdown("Check if you're at risk of heart disease by entering details below:")
@@ -32,8 +34,13 @@ if st.button("🔍 Predict Heart Disease"):
     input_data = np.array([[age, sex, cp, trestbps, chol, fbs, restecg,
                             thalach, exang, oldpeak, slope, ca, thal]])
     
-    prediction = model.predict(input_data)
+    # Scale the input using the same scaler used during training
+    input_scaled = scaler.transform(input_data)
 
+    # Predict
+    prediction = model.predict(input_scaled)
+
+    # Output
     if prediction[0] == 1:
         st.error("⚠️ High Risk of Heart Disease!")
     else:
